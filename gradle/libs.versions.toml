@@ -16,6 +16,8 @@ kotlin = "2.1.21"
 picocli = "4.7.5"
 pdfbox = "2.0.30"
 tess4j = "5.4.0"
+kotlinx-datetime = "0.5.0"
+
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -32,6 +34,7 @@ androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle
 picocli = { group = "info.picocli", name = "picocli", version.ref = "picocli" }
 pdfbox = { group = "org.apache.pdfbox", name = "pdfbox", version.ref = "pdfbox" }
 tess4j = { group = "net.sourceforge.tess4j", name = "tess4j", version.ref = "tess4j" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

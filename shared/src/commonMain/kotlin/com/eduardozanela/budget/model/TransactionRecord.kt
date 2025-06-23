@@ -1,6 +1,6 @@
 package com.eduardozanela.budget.model
 
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 data class TransactionRecord(
     val transactionDate: LocalDate,

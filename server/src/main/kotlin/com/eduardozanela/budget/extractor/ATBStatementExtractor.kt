@@ -8,27 +8,11 @@ class ATBStatementExtractor : BankStatementExtractor {
     private val logger = LoggerFactory.getLogger(ATBStatementExtractor::class.java)
 
     override fun extract(data: String): List<TransactionRecord> {
-        val records = mutableListOf<TransactionRecord>()
 
-        val regex = """([A-Z][a-z]{2} \\d{1,2})\\s+([A-Z][a-z]{2} \\d{1,2})\\s+(.+?)\\s+([-+]?\\d+\\.\\d{2})""".toRegex()
-        val matches = regex.findAll(data)
+        val regex = Regex("""^(\w{3,4}\s?\d{1,2})\s+(\w{3,4}\s?\d{1,2})\s+(.+?)\s+(\d+\.\d{2})(?:\s|$)""", RegexOption.MULTILINE)
+        val records = parseRecords(extractPurchasesSection(data, "PURCHASES AND RETURNS", "Total purchases"), regex)
 
-        if(matches.none()) {
-            logger.warn("No records found to ATB statement")
-        }
-
-        matches.forEach { matcher ->
-            val(startDateStr, postedDateStr, description, amountStr) = matcher.destructured
-
-            records.add(
-                TransactionRecord(
-                    parseDate(startDateStr),
-                    parseDate(postedDateStr),
-                    description,
-                    amountStr.toDouble()
-                )
-            )
-        }
+        logger.info("ATB Statement number of records found ${records.size}")
 
         return records
     }
