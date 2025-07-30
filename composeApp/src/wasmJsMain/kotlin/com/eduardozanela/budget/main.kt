@@ -8,5 +8,6 @@ import kotlinx.browser.document
 fun main() {
     ComposeViewport(document.body!!) {
         App()
+        H1
     }
 }

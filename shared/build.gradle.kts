@@ -38,7 +38,12 @@ kotlin {
             }
         }
     }
-    
+
+    js {
+        browser()
+        useEsModules()
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.datetime)

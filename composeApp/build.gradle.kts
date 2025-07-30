@@ -48,13 +48,24 @@ kotlin {
         }
         binaries.executable()
     }
+
+    js {
+        outputModuleName = "composeJsApp"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "jsComposeApp.js"
+            }
+        }
+        binaries.executable()
+    }
     
     sourceSets {
-        
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
         }
+
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -67,8 +78,39 @@ kotlin {
             implementation(projects.shared)
 
         }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+
+        jsMain.dependencies {
+            implementation(compose.html.core)
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+        }
+
+        jsTest.dependencies {
+            implementation(kotlin("test-js"))
+        }
+
+        val jsWasmMain by creating {
+            dependsOn(commonMain.get())
+            dependencies {
+                implementation(npm("uuid", "^9.0.1"))
+                implementation(compose.html.core)
+                implementation(compose.runtime)
+            }
+        }
+
+        val jsMain by getting {
+            dependsOn(jsWasmMain)
+        }
+
+        val wasmJsMain by getting {
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.html.core)
+            }
         }
     }
 }
@@ -103,4 +145,3 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
 }
-
