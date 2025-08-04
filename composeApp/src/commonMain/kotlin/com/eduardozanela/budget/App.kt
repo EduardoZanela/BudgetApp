@@ -19,25 +19,45 @@ import budgetapp.composeapp.generated.resources.Res
 import budgetapp.composeapp.generated.resources.compose_multiplatform
 
 @Composable
-@Preview
 fun App() {
+    var records by remember { mutableStateOf(sampleRecords()) }
+    var loading by remember { mutableStateOf(false) }
+    var csvContent by remember { mutableStateOf<String?>(null) }
+
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
+        Column(modifier = Modifier.fillMaxSize()) {
+            Header()
+
+            Spacer(Modifier.height(16.dp))
+
+            FileUploader {
+                loading = true
+                MainScope().launch {
+                    // Simulate processing
+                    kotlinx.coroutines.delay(1000)
+                    loading = false
                 }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            if (loading) {
+                Text("Processing PDF...", modifier = Modifier.align(Alignment.CenterHorizontally))
+            } else {
+                RecordTable(records) { updated -> records = updated }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            Button(onClick = {
+                csvContent = buildCsv(records)
+            }) {
+                Text("Export to CSV")
+            }
+
+            csvContent?.let {
+                Spacer(Modifier.height(8.dp))
+                Text("CSV Generated (simulate download):\n$it", modifier = Modifier.padding(16.dp))
             }
         }
     }
