@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="378.141" y1="179.918" x2="378.141" y2="375.026" id="gradient-0">
+      <stop offset="0" style="stop-color: rgb(82.745% 58.824% 0%)"/>
+      <stop offset="1" style="stop-color: rgb(51.51% 32.84% 0%)"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="351.932" y1="180.019" x2="351.932" y2="374.953" id="gradient-1">
+      <stop offset="0" style="stop-color: rgb(5.4902% 60.784% 34.902%)"/>
+      <stop offset="1" style="stop-color: rgb(0% 37.021% 15.954%)"/>
+    </linearGradient>
+  </defs>
+  <path d="M 288.578 180.019 L 346.573 180.04 L 416.295 283.5 L 340.86 374.953 L 287.569 374.868 L 288.578 180.019 Z" style="fill: url(&quot;#gradient-1&quot;);"/>
+  <path d="M 309.641 180.044 L 349.784 180 C 349.784 180 370 179 374 184 C 380 190 424.388 240 434.335 250 C 438.43 254.256 442.422 258.891 444.399 263.097 C 447.478 269.651 447.265 275 447.265 275 C 447.265 275 447.913 278.886 442.959 287.962 C 441.076 291.412 438.275 294.979 434.335 300 C 424.304 312.78 382.393 362.202 375 370 C 367.336 375.684 349 375 349 375 C 349 375 315 375 309 375 C 313 369.6 361.07 311.07 369.679 300 C 376.258 291.028 384.599 284.847 384.599 275 C 384.599 264.847 380.854 262.589 369.679 250 C 359.731 240 309.641 180.044 309.641 180.044 Z" style="paint-order: fill; fill: url(&quot;#gradient-0&quot;);"/>
+</svg>
