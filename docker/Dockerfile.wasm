@@ -1,0 +1,26 @@
+# Stage 1: Build the Kotlin/Wasm application
+# Use a base image with Gradle and JDK to build the project
+FROM gradle:8.13-jdk21 AS builder
+
+# Set the working directory inside the container
+WORKDIR /home/budgetApp
+
+# Copy the source code into the builder stage
+COPY --chown=gradle:gradle . /home/budgetApp
+
+# Run the Gradle task to build the distribution
+# wasmJsBrowserDistribution is a common task name, but it may vary
+RUN gradle wasmJsBrowserDistribution --no-daemon
+
+# Stage 2: Create the final image with a lightweight web server (e.g., Nginx)
+# Use a minimal Nginx image
+FROM nginx:alpine
+
+# Copy the built files from the builder stage to the Nginx web directory
+# The path to the distribution directory might vary based on your project structure
+COPY --from=builder /home/budgetApp/composeApp/build/dist/wasmJs/productionExecutable/ /usr/share/nginx/html
+
+# Expose the default Nginx port
+EXPOSE 80
+
+# The default Nginx CMD will serve the files, so we don't need to specify one

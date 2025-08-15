@@ -5,6 +5,7 @@ import com.eduardozanela.budget.service.StatementService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -14,6 +15,8 @@ import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/statement")
+// Allow requests from the Compose for Web development server running on localhost:8080
+@CrossOrigin(origins = ["*"])
 class StatementController(private val statementService: StatementService) {
 
     @PostMapping("/upload", produces = ["text/csv"])

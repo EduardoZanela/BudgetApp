@@ -1,20 +1,65 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
+import java.io.File
+
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidApplication)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.compose.compiler)
+}
+
+// In the 'kotlin' block, you'll configure and use the new task
+val generatedDir = layout.buildDirectory.dir("generated/kotlin/main")
+
+abstract class GenerateBuildConfigTask : DefaultTask() {
+    @get:Input
+    abstract val apiUrl: Property<String>
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @TaskAction
+    fun generate() {
+        val fileContent = """
+            package com.eduardozanela.budget.generated
+
+            object Config {
+                const val API_URL = "${apiUrl.get()}"
+            }
+        """.trimIndent()
+
+        val outputDirectory = outputDir.asFile.get()
+        outputDirectory.mkdirs()
+        File(outputDirectory, "Config.kt").writeText(fileContent)
+        println("Generated Config.kt with API_URL: ${apiUrl.get()}")
+    }
+}
+
+tasks.register<GenerateBuildConfigTask>("generateBuildConfig") {
+    // `wasmJsBrowserProductionWebpack` is the task for production builds.
+    val isProduction = project.gradle.startParameter.taskNames.any { it.contains("production", ignoreCase = true) }
+    val apiUrlGenerated = if (isProduction) {
+        "https://your-production-api-url.com" // TODO: Replace with your actual production URL
+    } else {
+        "http://localhost:8081"
+    }
+    apiUrl.set(apiUrlGenerated)
+    outputDir.set(generatedDir)
 }
 
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
     
@@ -29,12 +74,12 @@ kotlin {
         }
     }
     
-    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         outputModuleName = "composeApp"
         browser {
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
+
             commonWebpackConfig {
                 outputFileName = "composeApp.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
@@ -49,70 +94,70 @@ kotlin {
         binaries.executable()
     }
 
-    js {
-        outputModuleName = "composeJsApp"
-        browser {
-            commonWebpackConfig {
-                outputFileName = "jsComposeApp.js"
-            }
-        }
-        binaries.executable()
-    }
-    
     sourceSets {
 
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.ktor.client.okhttp)
+            implementation(libs.kotlinx.coroutines.android)
         }
 
-        commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(projects.shared)
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+        }
 
+        commonMain {
+            kotlin.srcDir(generatedDir)
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.ui)
+
+                // Use modern syntax for Compose dependencies
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+
+                implementation(libs.androidx.lifecycle.viewmodel)
+                implementation(libs.androidx.lifecycle.runtimeCompose)
+                implementation(projects.shared)
+
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.logging)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.datetime)
+            }
         }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
 
-        jsMain.dependencies {
-            implementation(compose.html.core)
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-        }
-
-        jsTest.dependencies {
-            implementation(kotlin("test-js"))
-        }
-
-        val jsWasmMain by creating {
-            dependsOn(commonMain.get())
+        wasmJsMain {
             dependencies {
-                implementation(npm("uuid", "^9.0.1"))
-                implementation(compose.html.core)
-                implementation(compose.runtime)
-            }
-        }
-
-        val jsMain by getting {
-            dependsOn(jsWasmMain)
-        }
-
-        val wasmJsMain by getting {
-            dependencies {
-                implementation(compose.runtime)
-                implementation(compose.html.core)
+                // Ktor engine for wasmJs
+                implementation(libs.ktor.client.js)
             }
         }
     }
+}
+
+// -------------------------------------------------------------------
+// 4. TASK DEPENDENCIES
+//    (This is the most critical part for a correct build order)
+//// -------------------------------------------------------------------
+tasks.named("preBuild") {
+    dependsOn("generateBuildConfig")
+}
+tasks.named("compileKotlinWasmJs") {
+    dependsOn("generateBuildConfig")
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon> {
+    dependsOn("generateBuildConfig")
 }
 
 android {

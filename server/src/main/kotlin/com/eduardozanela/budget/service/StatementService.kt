@@ -5,11 +5,12 @@ import com.eduardozanela.budget.extractor.ATBStatementExtractor
 import com.eduardozanela.budget.extractor.CTFSStatementExtractor
 import com.eduardozanela.budget.extractor.NeoStatementExtractor
 import com.eduardozanela.budget.model.Bank
-import com.eduardozanela.budget.util.CSVUtil
+import com.eduardozanela.budget.utils.CSVUtil
 import net.sourceforge.tess4j.Tesseract
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.rendering.PDFRenderer
 import org.apache.pdfbox.text.PDFTextStripper
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.awt.image.BufferedImage
@@ -17,7 +18,10 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
 @Service
-class StatementService {
+class StatementService(
+    @param:Value("\${tesseract.datapath}")
+    private val tesseractDataPath: String
+) {
 
     fun extract(file: MultipartFile, bank: Bank): ByteArray {
         val text = when (bank) {
@@ -50,7 +54,7 @@ class StatementService {
 
             val renderer = PDFRenderer(document)
             val tesseract = Tesseract().apply {
-                setDatapath("C:\\\\Program Files\\\\Tesseract-OCR\\\\tessdata") // or your path
+                setDatapath(tesseractDataPath) // or your path
                 setLanguage("eng")
             }
 

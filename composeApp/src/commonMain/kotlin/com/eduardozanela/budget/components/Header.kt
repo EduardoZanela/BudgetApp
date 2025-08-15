@@ -1,9 +1,9 @@
-import androidx.compose.foundation.layout.*
+package com.eduardozanela.budget.components
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Header() {
     TopAppBar(

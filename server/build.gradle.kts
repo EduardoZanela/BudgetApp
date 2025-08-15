@@ -1,30 +1,55 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
 plugins {
-    id("org.springframework.boot") version "3.2.0"
-    id("io.spring.dependency-management") version "1.1.0"
-    alias(libs.plugins.kotlinJvm)
-    application
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.kotlin.jvm)
 }
 
 group = "com.eduardozanela.budget"
 version = "1.0.0"
-application {
-    mainClass.set("com.eduardozanela.budget.ApplicationKt")
-    
-    val isDevelopment: Boolean = project.ext.has("development")
-    //applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+
+// Configure Java toolchain for JDK 21
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 dependencies {
     implementation(projects.shared)
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.reactivestreams:reactive-streams")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.0")
+    implementation(libs.spring.boot.starter.web)
+    implementation(libs.jackson.module.kotlin)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.reactor)
     implementation(libs.picocli)
     implementation(libs.pdfbox)
     implementation(libs.tess4j)
     implementation(libs.kotlinx.datetime)
-    testImplementation(libs.kotlin.testJunit)
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(libs.kotlin.test.junit)
+    testImplementation(libs.spring.boot.starter.test)
+}
+
+// Configure Kotlin compilation options
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions{
+        jvmTarget = JvmTarget.JVM_21 // Ensure Kotlin compiles for JVM 21
+    }
+}
+
+plugins.withType<org.springframework.boot.gradle.plugin.SpringBootPlugin> {
+    tasks.named<BootJar>("bootJar") {
+        // ===================================================================
+        // Manage Build Variants (e.g., 'dev' or 'prod') at Build Time
+        // ===================================================================
+        // Define a custom Gradle property to control the build variant.
+        // You can pass this property via the command line:
+        // ./gradlew bootJar -PbuildVariant=prod
+        // ./gradlew bootJar -PbuildVariant=dev (or default if not specified)
+        // val buildVariant = project.findProperty("buildVariant")?.toString() ?: "dev"
+
+        // Customize the output JAR filename based on the build variant
+        archiveFileName.set("server-${version.toString()}.jar")
+    }
 }

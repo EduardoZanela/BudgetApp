@@ -1,0 +1,41 @@
+# Stage 1: The Build Stage
+# Uses a full JDK for Gradle to build your Spring Boot application
+FROM gradle:8.13-jdk21 AS builder
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the source code into the container
+COPY --chown=gradle:gradle . /app
+
+# Run the Gradle build. This will produce a JAR file.
+# The `assemble` task is generally sufficient for producing a runnable JAR.
+RUN gradle server:bootJar --no-daemon
+
+#-------------------------------------------------------------------------------------------------------------------
+
+# Stage 2: The Final Production Image
+# This stage is for running the application and contains Tesseract-OCR
+# Using a slim JRE image keeps the final image size minimal
+FROM eclipse-temurin:21-jre-jammy
+
+# Install Tesseract-OCR and its language data
+# 'jammy' indicates an Ubuntu 22.04 base, so we use apt-get
+# We install Tesseract itself and the English language pack (eng)
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr \
+    tesseract-ocr-eng \
+    && rm -rf /var/lib/apt/lists/*
+
+# If you need other languages, add them here. For example, for German:
+# RUN apt-get update && apt-get install -y tesseract-ocr-deu && rm -rf /var/lib/apt/lists/*
+
+# Copy the built JAR from the builder stage
+# The path to your JAR may vary. Adjust it to match your project's build output.
+COPY --from=builder /app/server/build/libs/*.jar /app.jar
+
+# Expose the port your Spring Boot application runs on
+EXPOSE 8080
+
+# Define the entrypoint to run the JAR file
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "/app.jar"]
