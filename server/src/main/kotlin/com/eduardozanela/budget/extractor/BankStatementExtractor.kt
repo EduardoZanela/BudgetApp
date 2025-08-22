@@ -1,6 +1,7 @@
 package com.eduardozanela.budget.extractor
 
 import com.eduardozanela.budget.model.TransactionRecord
+import com.eduardozanela.budget.utils.DateParser
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -45,8 +46,8 @@ interface BankStatementExtractor {
             val (startDateStr, postedDateStr, description, amountStr) = match.destructured
             records.add(
                 TransactionRecord(
-                    parseDate(startDateStr),
-                    parseDate(postedDateStr),
+                    DateParser.parseDate(startDateStr),
+                    DateParser.parseDate(postedDateStr),
                     description,
                     amountStr.toDouble()
                 )

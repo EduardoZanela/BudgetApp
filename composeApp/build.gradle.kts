@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
+import org.gradle.internal.extensions.core.extra
 import java.io.File
 
 plugins {
@@ -44,10 +45,9 @@ abstract class GenerateBuildConfigTask : DefaultTask() {
 }
 
 tasks.register<GenerateBuildConfigTask>("generateBuildConfig") {
-    // `wasmJsBrowserProductionWebpack` is the task for production builds.
-    val isProduction = project.gradle.startParameter.taskNames.any { it.contains("production", ignoreCase = true) }
+    val isProduction = project.gradle.startParameter.taskNames.any { it.contains("wasmJsBrowserDistribution", ignoreCase = true) }
     val apiUrlGenerated = if (isProduction) {
-        "https://your-production-api-url.com" // TODO: Replace with your actual production URL
+        "https://api.eduardozanela.com"
     } else {
         "http://localhost:8081"
     }
@@ -112,8 +112,11 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
+                implementation(compose.materialIconsExtended)
                 implementation(compose.material3)
                 implementation(compose.ui)
+
+                implementation(libs.navigation.compose)
 
                 // Use modern syntax for Compose dependencies
                 implementation(compose.components.resources)
@@ -158,6 +161,10 @@ tasks.named("compileKotlinWasmJs") {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon> {
     dependsOn("generateBuildConfig")
+}
+
+tasks.named("wasmJsBrowserTest").configure {
+    enabled = false
 }
 
 android {

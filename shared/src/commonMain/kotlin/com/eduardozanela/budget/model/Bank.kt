@@ -4,5 +4,6 @@ enum class Bank {
     NEO,
     CTFS,
     ATB,
-    ATBCHEQUING
+    ATBCHEQUING,
+    MBNA
 }

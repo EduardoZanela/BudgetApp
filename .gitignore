@@ -9,10 +9,63 @@ local.properties
 .DS_Store
 captures
 .externalNativeBuild
-.cxx
+
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
 !*.xcodeproj/xcshareddata/
 !*.xcodeproj/project.xcworkspace/
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
+
+# Gradle
+.gradle/
+build/
+*/build/
+
+# Gradle Wrapper
+gradle/wrapper/gradle-wrapper.jar
+
+
+# Android Studio / IntelliJ
+.idea/
+*.iws
+*.ipr
+out/
+
+# Kotlin Multiplatform generated files
+*.kotlin_module
+*.kotlin_metadata
+*.kotlin_classes/
+
+# Android-specific
+captures/
+.cxx/
+
+# iOS / Xcode
+*.xcworkspace/
+*.xcuserdata/
+*.xcodeproj/project.xcworkspace/
+*.xcodeproj/xcuserdata/
+*.framework
+*.dSYM
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# JS / WASM
+node_modules/
+*.js
+*.js.map
+*.wasm
+*.tsbuildinfo
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp

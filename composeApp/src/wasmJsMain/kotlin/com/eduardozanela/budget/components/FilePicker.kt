@@ -35,7 +35,7 @@ actual fun FilePicker(onFileSelected: (ByteArray, String) -> Unit, modifier: Mod
         },
         modifier = modifier
     ) {
-        Text("Upload PDF")
+        Text("Upload Statement")
     }
 }
 

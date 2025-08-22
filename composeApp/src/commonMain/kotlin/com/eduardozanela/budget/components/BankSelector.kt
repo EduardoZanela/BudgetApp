@@ -25,7 +25,7 @@ fun BankSelector(
 
     Box(modifier = modifier.wrapContentSize(Alignment.TopStart)) {
         Button(onClick = { expanded = true }) {
-            Text("Bank: ${selectedBank.name}")
+            Text(selectedBank.name)
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             Bank.entries.forEach { bank ->

@@ -1,0 +1,5 @@
+<resources>
+    <string name="main_screen">budget</string>
+    <string name="import_screen">import</string>
+    <string name="import_button">Upload Statement</string>
+</resources>

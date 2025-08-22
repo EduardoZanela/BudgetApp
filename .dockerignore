@@ -1,6 +1,7 @@
 # Ignore Gradle build directories and caches
 build/
 .gradle/
+**/build/
 
 # Ignore IDE-specific files and directories
 .idea/

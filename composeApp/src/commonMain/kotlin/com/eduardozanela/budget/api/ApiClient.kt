@@ -1,14 +1,21 @@
 package com.eduardozanela.budget.api
 
+import com.eduardozanela.budget.generated.Config
 import com.eduardozanela.budget.model.Bank
 import io.ktor.client.*
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.accept
 import io.ktor.client.plugins.logging.*
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.utils.io.errors.*
+
 
 class ApiClient {
 
@@ -28,8 +35,7 @@ class ApiClient {
 
     suspend fun uploadFile(fileBytes: ByteArray, fileName: String, bank: Bank): Result<String> {
         // IMPORTANT: Replace with your actual API endpoint
-        //Config.API_URL;
-        val endpoint = "http://localhost:8081/api/statement/upload"
+        val endpoint = "${Config.API_URL}/api/statement/upload"
         return try {
             val response: HttpResponse = client.submitFormWithBinaryData(
                 url = endpoint,
@@ -45,19 +51,25 @@ class ApiClient {
                     )
                 }
             ) {
-                // Explicitly tell the server we can accept a CSV response for this request.
                 accept(ContentType.Text.CSV)
+                timeout {
+                    requestTimeoutMillis = 10_000 // 10s timeout
+                }
             }
 
             if (response.status.isSuccess()) {
-                // On success, return the CSV content from the response body.
                 Result.success(response.bodyAsText())
             } else {
-                // On failure, return a more descriptive error.
-                Result.failure(Exception("Upload failed with status ${response.status}: ${response.bodyAsText()}"))
+                Result.failure(Exception("Upload failed: ${response.status.value} ${response.bodyAsText()}"))
             }
-        } catch (e: Exception) {
-            Result.failure(e)
+        } catch (e: HttpRequestTimeoutException) {
+            Result.failure(Exception("Request timed out after 10s", e))
+        } catch (e: ClientRequestException) {
+            Result.failure(Exception("Client error: ${e.response.status}", e))
+        } catch (e: ServerResponseException) {
+            Result.failure(Exception("Server error: ${e.response.status}", e))
+        } catch (e: Throwable) {
+            Result.failure(Exception("Unexpected error: ${e.message}", e))
         }
     }
 }

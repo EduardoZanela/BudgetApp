@@ -3,6 +3,7 @@ package com.eduardozanela.budget.service
 import com.eduardozanela.budget.extractor.ATBChequingStatementExtractor
 import com.eduardozanela.budget.extractor.ATBStatementExtractor
 import com.eduardozanela.budget.extractor.CTFSStatementExtractor
+import com.eduardozanela.budget.extractor.MBNAStatementExtractor
 import com.eduardozanela.budget.extractor.NeoStatementExtractor
 import com.eduardozanela.budget.model.Bank
 import com.eduardozanela.budget.utils.CSVUtil
@@ -34,6 +35,7 @@ class StatementService(
             Bank.ATBCHEQUING -> ATBChequingStatementExtractor()
             Bank.CTFS -> CTFSStatementExtractor()
             Bank.NEO -> NeoStatementExtractor()
+            Bank.MBNA -> MBNAStatementExtractor()
         }
 
         val records = extractor.extract(text)

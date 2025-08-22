@@ -1,0 +1,28 @@
+version: '3.8' # Specify the Docker Compose file format version
+
+services:
+  # Service for the Kotlin/Wasm frontend application
+  budget-app:
+    image: budget-app # The name of the Docker image for your frontend
+    container_name: budget-app # A custom name for the container
+    ports:
+      - "8080:80" # Map host port 80 to container port 80 (where Nginx serves the Wasm app)
+    networks:
+      - budget-network # Assign this service to the shared network
+
+  # Service for the Spring Boot backend application
+  budget-api:
+    image: budget-server # The name of the Docker image for your backend
+    container_name: budget-api # A custom name for the container
+    environment:
+      # Activate the production Spring profile for the backend
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - "8081:8081"
+    networks:
+      - budget-network # Assign this service to the shared network
+
+# Define the shared network
+networks:
+  budget-network:
+    driver: bridge # Use the default bridge driver for a custom network
