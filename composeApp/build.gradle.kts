@@ -15,6 +15,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.sqldelight)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 // In the 'kotlin' block, you'll configure and use the new task
@@ -101,10 +103,14 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlinx.coroutines.android)
+            implementation(libs.sqldelight.android.driver)
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
         }
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+            implementation(libs.sqldelight.native.driver)
         }
 
         commonMain {
@@ -126,12 +132,19 @@ kotlin {
                 implementation(libs.androidx.lifecycle.runtimeCompose)
                 implementation(projects.shared)
 
+                implementation(libs.sqldelight.coroutines.extensions)
+                implementation(libs.koin.core)
+                implementation(libs.koin.compose)
+
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.logging)
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.kotlinx.json)
+                implementation(libs.kotlinx.serialization.json)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kotlinx.datetime)
+
+                implementation(libs.uuid)
             }
         }
 
@@ -165,6 +178,14 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon> {
 
 tasks.named("wasmJsBrowserTest").configure {
     enabled = false
+}
+
+sqldelight {
+    databases {
+        create("Database") {
+            packageName.set("com.eduardozanela.budget")
+        }
+    }
 }
 
 android {

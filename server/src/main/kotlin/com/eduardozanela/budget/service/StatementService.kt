@@ -1,12 +1,13 @@
 package com.eduardozanela.budget.service
 
+import com.eduardozanela.budget.data.Record
+import com.eduardozanela.budget.data.toRecord
 import com.eduardozanela.budget.extractor.ATBChequingStatementExtractor
 import com.eduardozanela.budget.extractor.ATBStatementExtractor
 import com.eduardozanela.budget.extractor.CTFSStatementExtractor
 import com.eduardozanela.budget.extractor.MBNAStatementExtractor
 import com.eduardozanela.budget.extractor.NeoStatementExtractor
-import com.eduardozanela.budget.model.Bank
-import com.eduardozanela.budget.utils.CSVUtil
+import com.eduardozanela.budget.domain.Bank
 import net.sourceforge.tess4j.Tesseract
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.rendering.PDFRenderer
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.awt.image.BufferedImage
-import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
 @Service
@@ -24,7 +24,7 @@ class StatementService(
     private val tesseractDataPath: String
 ) {
 
-    fun extract(file: MultipartFile, bank: Bank): ByteArray {
+    fun extract(file: MultipartFile, bank: Bank): List<Record> {
         val text = when (bank) {
             Bank.ATB, Bank.ATBCHEQUING -> extractTextWithOcr(file.inputStream)
             else -> extractTextEncrypted(file.inputStream)
@@ -40,10 +40,7 @@ class StatementService(
 
         val records = extractor.extract(text)
 
-        val output = ByteArrayOutputStream()
-        CSVUtil.exportToCustomCsv(records, output, bank)
-
-        return output.toByteArray()
+        return records.map { record -> record.toRecord() }
     }
 
     private fun extractTextWithOcr(inputStream: InputStream): String {

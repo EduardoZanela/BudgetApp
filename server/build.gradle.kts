@@ -50,6 +50,7 @@ plugins.withType<org.springframework.boot.gradle.plugin.SpringBootPlugin> {
         // val buildVariant = project.findProperty("buildVariant")?.toString() ?: "dev"
 
         // Customize the output JAR filename based on the build variant
-        archiveFileName.set("server-${version.toString()}.jar")
+        //archiveFileName.set("server-${version.toString()}.jar")
+        archiveFileName.set("budget-server.jar")
     }
 }

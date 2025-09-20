@@ -1,6 +1,7 @@
 package com.eduardozanela.budget.extractor
 
-import com.eduardozanela.budget.model.TransactionRecord
+import com.eduardozanela.budget.data.TransactionRecord
+import com.eduardozanela.budget.domain.Bank
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.slf4j.LoggerFactory
@@ -54,7 +55,9 @@ class CTFSStatementExtractor : BankStatementExtractor {
                     date,
                     date,
                     "Plan Start: $startDate Original amount: $originalAmount Balance: $balanceStr, Expiry date: $expireDate",
-                    currentInstallment.toDouble()
+                    currentInstallment.toDouble(),
+                    category = "",
+                    account = Bank.CTFS
                 )
             )
         }
@@ -70,7 +73,7 @@ class CTFSStatementExtractor : BankStatementExtractor {
 
         val records = mutableListOf<TransactionRecord>()
 
-        records.addAll(parseRecords(text, regex))
+        records.addAll(parseRecords(text, Bank.CTFS, regex))
         records.addAll(extractInstallmentPlans(data))
 
         logger.info("CTFS Statement number of records found ${records.size}")

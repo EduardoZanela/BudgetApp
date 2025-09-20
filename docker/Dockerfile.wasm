@@ -3,14 +3,16 @@
 FROM gradle:8.13-jdk21 AS builder
 
 # Set the working directory inside the container
-WORKDIR /home/budgetApp
+WORKDIR /app
+
+# Add a build argument that will change on each build
+ARG CACHEBUST=1
 
 # Copy the source code into the builder stage
-COPY --chown=gradle:gradle . /home/budgetApp
+COPY --chown=gradle:gradle . /app
 
 # Run the Gradle task to build the distribution
-# wasmJsBrowserDistribution is a common task name, but it may vary
-RUN gradle wasmJsBrowserDistribution --no-daemon
+RUN gradle wasmJsBrowserDistribution --no-daemon --no-configuration-cache --refresh-dependencies
 
 # Stage 2: Create the final image with a lightweight web server (e.g., Nginx)
 # Use a minimal Nginx image
@@ -18,7 +20,7 @@ FROM nginx:alpine
 
 # Copy the built files from the builder stage to the Nginx web directory
 # The path to the distribution directory might vary based on your project structure
-COPY --from=builder /home/budgetApp/composeApp/build/dist/wasmJs/productionExecutable/ /usr/share/nginx/html
+COPY --from=builder /app/composeApp/build/dist/wasmJs/productionExecutable/ /usr/share/nginx/html
 
 # Expose the default Nginx port
 EXPOSE 80

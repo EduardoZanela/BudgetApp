@@ -1,5 +1,11 @@
 <resources>
-    <string name="main_screen">budget</string>
-    <string name="import_screen">import</string>
+    <string name="app_name">Budget Flow</string>
+
+    <string name="main_screen">Home</string>
+    <string name="import_screen">Import Statement</string>
+    <string name="add_transaction_screen">New Transaction</string>
+    <string name="transactions_screen">Transactions</string>
+
     <string name="import_button">Upload Statement</string>
+
 </resources>

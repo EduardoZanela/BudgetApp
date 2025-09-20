@@ -1,5 +1,5 @@
 [versions]
-agp = "8.10.0"
+agp = "8.13.0"
 android-compileSdk = "35"
 android-minSdk = "24"
 android-targetSdk = "35"
@@ -11,6 +11,7 @@ androidx-testExt = "1.3.0"
 composeMultiplatform = "1.8.2"
 coroutines = "1.10.2"
 junit = "4.13.2"
+koin = "4.1.0"
 kotlin = "2.2.0"
 kotlinx-datetime = "0.6.0"
 kotlinx-serialization-json = "1.8.1"
@@ -18,8 +19,10 @@ ktor = "3.2.3"
 navigation = "2.9.0-beta03"
 pdfbox = "2.0.30"
 picocli = "4.7.5"
+uuid = "0.8.4"
 springBoot = "3.2.0"
 springDependencyManagement = "1.1.0"
+sqldelight = "2.1.0"
 tess4j = "5.4.0"
 
 [libraries]
@@ -31,8 +34,14 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 kotlinx-coroutines-reactor = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-reactor", version.ref = "coroutines" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
-
 navigation-compose = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+
+koin-core = { group = "io.insert-koin", name = "koin-core",version.ref = "koin" }
+koin-compose = { group = "io.insert-koin", name = "koin-compose",version.ref = "koin" }
+koin-android = { group = "io.insert-koin", name = "koin-android",version.ref = "koin" }
+koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose",version.ref = "koin" }
+
+uuid = { group = "com.benasher44", name = "uuid", version.ref = "uuid"}
 
 # AndroidX
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -64,6 +73,11 @@ picocli = { group = "info.picocli", name = "picocli", version.ref = "picocli" }
 pdfbox = { group = "org.apache.pdfbox", name = "pdfbox", version.ref = "pdfbox" }
 tess4j = { group = "net.sourceforge.tess4j", name = "tess4j", version.ref = "tess4j" }
 
+# Database
+sqldelight-android-driver = { group = "app.cash.sqldelight", name = "android-driver", version.ref = "sqldelight" }
+sqldelight-native-driver = { group = "app.cash.sqldelight", name = "native-driver", version.ref = "sqldelight" }
+sqldelight-coroutines-extensions = { group = "app.cash.sqldelight", name = "coroutines-extensions", version.ref = "sqldelight" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
@@ -74,3 +88,5 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}

@@ -1,0 +1,35 @@
+CREATE TABLE transactionEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    amount REAL NOT NULL,
+    description TEXT NOT NULL,
+    category TEXT NOT NULL,
+    type TEXT NOT NULL,
+    date INTEGER NOT NULL, -- Stored as Unix epoch milliseconds
+    accountId TEXT NOT NULL
+);
+
+insertTransaction:
+INSERT INTO transactionEntity(id, amount, description, category, type, date, accountId)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+selectTransactionById:
+SELECT * FROM transactionEntity WHERE id = ?;
+
+selectAllTransactions:
+SELECT * FROM transactionEntity ORDER BY date DESC;
+
+updateTransaction:
+UPDATE transactionEntity
+SET amount = ?, description = ?, category = ?, type = ?, date = ?, accountId = ?
+WHERE id = ?;
+
+deleteTransaction:
+DELETE FROM transactionEntity WHERE id = ?;
+
+searchTransactions:
+SELECT * FROM transactionEntity
+WHERE (:searchText IS NULL OR description LIKE :searchText OR category LIKE :searchText)
+  AND (:category IS NULL OR category = :category)
+  AND (:startDate IS NULL OR date >= :startDate)
+  AND (:endDate IS NULL OR date <= :endDate)
+ORDER BY date DESC;

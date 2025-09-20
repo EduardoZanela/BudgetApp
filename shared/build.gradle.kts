@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -44,6 +45,7 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.json)
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

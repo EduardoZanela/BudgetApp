@@ -1,6 +1,7 @@
 package com.eduardozanela.budget.extractor
 
-import com.eduardozanela.budget.model.TransactionRecord
+import com.eduardozanela.budget.data.TransactionRecord
+import com.eduardozanela.budget.domain.Bank
 import com.eduardozanela.budget.utils.DateParser
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
@@ -37,21 +38,27 @@ interface BankStatementExtractor {
         return LocalDate(currentYear, month, day)
     }
 
-    fun parseRecords(data: String, regex: Regex) : List<TransactionRecord> {
-
+    fun parseRecords(
+        data: String,
+        bank: Bank,
+        regex: Regex,
+        builder: (MatchResult) -> TransactionRecord = { match ->
+            val (startDateStr, postedDateStr, description, amountStr) = match.destructured
+            TransactionRecord(
+                DateParser.parseDate(startDateStr),
+                DateParser.parseDate(postedDateStr),
+                description,
+                amountStr.replace("[^\\d.]".toRegex(), "").toDouble(),
+                "",
+                bank
+            )
+         }
+    ):List<TransactionRecord> {
         val records = mutableListOf<TransactionRecord>()
         val matches = regex.findAll(data)
 
         matches.forEach { match ->
-            val (startDateStr, postedDateStr, description, amountStr) = match.destructured
-            records.add(
-                TransactionRecord(
-                    DateParser.parseDate(startDateStr),
-                    DateParser.parseDate(postedDateStr),
-                    description,
-                    amountStr.toDouble()
-                )
-            )
+           records.add(builder(match))
         }
         return records
     }

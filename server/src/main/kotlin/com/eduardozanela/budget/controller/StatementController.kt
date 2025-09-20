@@ -1,6 +1,6 @@
 package com.eduardozanela.budget.controller
 
-import com.eduardozanela.budget.model.Bank
+import com.eduardozanela.budget.domain.Bank
 import com.eduardozanela.budget.service.StatementService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -12,24 +12,23 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
+import com.eduardozanela.budget.data.Record
 
 @RestController
 @RequestMapping("/api/statement")
-// Allow requests from the Compose for Web development server running on localhost:8080
-@CrossOrigin(origins = ["*"])
+@CrossOrigin(origins = ["https://budgetflow.eduardozanela.com", "http://localhost:8080"])
 class StatementController(private val statementService: StatementService) {
 
-    @PostMapping("/upload", produces = ["text/csv"])
-    suspend fun handleUpload(@RequestPart("file") file: MultipartFile, @RequestParam("bank") bank: Bank): ResponseEntity<ByteArray> {
-        val csvBytes = statementService.extract(file, bank)
+    @PostMapping("/upload", produces = ["application/json"])
+    suspend fun handleUpload(@RequestPart("file") file: MultipartFile, @RequestParam("bank") bank: Bank): ResponseEntity<List<Record>> {
+        val records = statementService.extract(file, bank)
 
         val headers = HttpHeaders().apply {
-            add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=statement.csv")
-            contentType = MediaType("text", "csv")
+            contentType = MediaType("application", "json")
         }
 
-        return ResponseEntity.ok()
+        return  ResponseEntity.ok()
             .headers(headers)
-            .body(csvBytes)
+            .body(records);
     }
 }

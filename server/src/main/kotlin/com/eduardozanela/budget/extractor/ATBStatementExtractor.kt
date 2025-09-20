@@ -1,6 +1,7 @@
 package com.eduardozanela.budget.extractor
 
-import com.eduardozanela.budget.model.TransactionRecord
+import com.eduardozanela.budget.data.TransactionRecord
+import com.eduardozanela.budget.domain.Bank
 import org.slf4j.LoggerFactory
 
 class ATBStatementExtractor : BankStatementExtractor {
@@ -10,7 +11,7 @@ class ATBStatementExtractor : BankStatementExtractor {
     override fun extract(data: String): List<TransactionRecord> {
 
         val regex = Regex("""^(\w{3,4}\s?\d{1,2})\s+(\w{3,4}\s?\d{1,2})\s+(.+?)\s+(\d+\.\d{2})(?:\s|$)""", RegexOption.MULTILINE)
-        val records = parseRecords(extractPurchasesSection(data, "PURCHASES AND RETURNS", "Total purchases"), regex)
+        val records = parseRecords(extractPurchasesSection(data, "PURCHASES AND RETURNS", "Total purchases"), Bank.ATB, regex)
 
         logger.info("ATB Statement number of records found ${records.size}")
 
