@@ -1,6 +1,7 @@
 package com.eduardozanela.budget.domain
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlin.time.ExperimentalTime
 
@@ -12,4 +13,6 @@ interface TransactionRepository {
     suspend fun deleteTransaction(id: String)
     @OptIn(ExperimentalTime::class)
     suspend fun searchTransaction(query: String, category: String?, startDate: LocalDateTime?, endDate: LocalDateTime?): Flow<List<Transaction>>
+    @OptIn(ExperimentalTime::class)
+    suspend fun searchTransaction(category: String?, selectedMonth: LocalDate): Flow<List<Transaction>>
 }

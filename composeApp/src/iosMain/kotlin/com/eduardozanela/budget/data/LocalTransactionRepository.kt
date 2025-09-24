@@ -13,26 +13,13 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
-
-// SQLDelight Type Adapters
-// You would define these adapters to convert between your Kotlin types (Instant, TransactionType)
-// and the database types (Long, String).
-// Example:
-// val transactionTypeAdapter = object : ColumnAdapter<TransactionType, String> {
-//    override fun decode(databaseValue: String) = TransactionType.valueOf(databaseValue)
-//    override fun encode(value: TransactionType) = value.name
-// }
-// val instantAdapter = object : ColumnAdapter<Instant, Long> {
-//    override fun decode(databaseValue: Long) = Instant.fromEpochMilliseconds(databaseValue)
-//    override fun encode(value: Instant) = value.toEpochMilliseconds()
-// }
 
 class LocalTransactionRepository(private val database: Database) : TransactionRepository {
 
@@ -116,5 +103,12 @@ class LocalTransactionRepository(private val database: Database) : TransactionRe
                 .mapToList(Dispatchers.IO)
                 .map { entities -> entities.map { it.toDomain() } }
         }
+    }
+
+    override suspend fun searchTransaction(
+        category: String?,
+        selectedMonth: LocalDate
+    ): Flow<List<Transaction>> {
+        TODO("Not yet implemented")
     }
 }

@@ -1,5 +1,7 @@
 package com.eduardozanela.budget.data
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
@@ -9,30 +11,16 @@ import com.eduardozanela.budget.domain.TransactionRepository
 import com.eduardozanela.budget.domain.TransactionType
 import com.eduardozanela.budget.sqldelight.transactions.TransactionEntity
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
-
-// SQLDelight Type Adapters
-// You would define these adapters to convert between your Kotlin types (Instant, TransactionType)
-// and the database types (Long, String).
-// Example:
-// val transactionTypeAdapter = object : ColumnAdapter<TransactionType, String> {
-//    override fun decode(databaseValue: String) = TransactionType.valueOf(databaseValue)
-//    override fun encode(value: TransactionType) = value.name
-// }
-// val instantAdapter = object : ColumnAdapter<Instant, Long> {
-//    override fun decode(databaseValue: Long) = Instant.fromEpochMilliseconds(databaseValue)
-//    override fun encode(value: Instant) = value.toEpochMilliseconds()
-// }
 
 class LocalTransactionRepository(private val database: Database) : TransactionRepository {
 
@@ -117,4 +105,38 @@ class LocalTransactionRepository(private val database: Database) : TransactionRe
                 .map { entities -> entities.map { it.toDomain() } }
         }
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override suspend fun searchTransaction(
+        category: String?,
+        selectedMonth: LocalDate
+    ): Flow<List<Transaction>> {
+        return withContext( Dispatchers.IO ) {
+            val firstDayOfMonth = LocalDateTime(
+                selectedMonth.year,
+                selectedMonth.monthNumber,
+                1,
+                0,
+                1)
+            val lastDayOfMonth = LocalDateTime(
+                selectedMonth.year,
+                selectedMonth.monthNumber,
+                selectedMonth.month.length(selectedMonth.year.isLeapYear()),
+                23,
+                59
+            )
+            database.transactionsQueries.searchTransactions(
+                searchText = null,
+                category = category,
+                startDate = firstDayOfMonth.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds(),
+                endDate = lastDayOfMonth.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+            )
+                .asFlow()
+                .mapToList(Dispatchers.IO)
+                .map { entities -> entities.map { it.toDomain() } }
+        }
+    }
 }
+
+fun Int.isLeapYear(): Boolean =
+    (this % 4 == 0 && this % 100 != 0) || (this % 400 == 0)

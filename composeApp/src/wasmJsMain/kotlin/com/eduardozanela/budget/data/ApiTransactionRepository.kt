@@ -5,6 +5,7 @@ import com.eduardozanela.budget.domain.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 
 class ApiTransactionRepository(private val apiService: TransactionApiService) : TransactionRepository {
@@ -50,5 +51,12 @@ class ApiTransactionRepository(private val apiService: TransactionApiService) : 
         return flow {
             emit(apiService.searchTransactions(query, category, startDate, endDate))
         }
+    }
+
+    override suspend fun searchTransaction(
+        category: String?,
+        selectedMonth: LocalDate
+    ): Flow<List<Transaction>> {
+        TODO("Not yet implemented")
     }
 }

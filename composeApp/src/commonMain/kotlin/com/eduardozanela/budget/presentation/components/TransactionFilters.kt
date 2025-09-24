@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.eduardozanela.budget.di.getViewModel
+import com.eduardozanela.budget.presentation.transaction.SearchTransactionViewModel
 import com.eduardozanela.budget.presentation.transaction.TransactionListViewModel
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -41,7 +42,7 @@ import kotlinx.datetime.toLocalDateTime
 @Composable
 fun TransactionFilters(
     modifier: Modifier = Modifier,
-    viewModel: TransactionListViewModel = getViewModel()
+    viewModel: SearchTransactionViewModel = getViewModel()
 ) {
     val startDate by viewModel.startDate.collectAsState()
     val endDate by viewModel.endDate.collectAsState()
