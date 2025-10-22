@@ -1,7 +1,5 @@
 package com.eduardozanela.budget.presentation.transaction.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,15 +7,17 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
 import com.eduardozanela.budget.domain.TransactionType
 import com.eduardozanela.budget.presentation.components.DatePickerDialogWrapper
@@ -35,12 +35,42 @@ import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Title
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
 import com.eduardozanela.budget.presentation.transaction.AddTransactionErrorType
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.stringResource
+
+@Composable
+private fun thousandSeparatorTransformation(): VisualTransformation {
+    return VisualTransformation { text ->
+        val originalText = text.text.replace(",", "")
+        if (originalText.isBlank() || originalText == ".")
+            // Labeled return
+            return@VisualTransformation TransformedText(
+                AnnotatedString(originalText),
+                OffsetMapping.Identity
+            )
+
+        val integerPart = originalText.substringBefore('.')
+        val decimalPart = if (originalText.contains('.')) "." + originalText.substringAfter('.') else ""
+
+        val formattedIntegerPart = integerPart
+            .reversed()
+            .chunked(3)
+            .joinToString(",")
+            .reversed()
+
+        val formattedText = formattedIntegerPart + decimalPart
+
+        val offsetMapping = ThousandSeparatorOffsetMapping(originalText, formattedText)
+        TransformedText(AnnotatedString(formattedText), offsetMapping)
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +88,7 @@ fun AddTransactionScreen(
     var categories by remember { mutableStateOf(listOf("Salary", "Groceries", "Transport", "Rent", "Utilities", "Entertainment", "Food")) }
     var expanded by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
 
     val dateFormatter = remember {
         LocalDateTime.Format {
@@ -71,6 +102,10 @@ fun AddTransactionScreen(
             char(' ')
             year()
         }
+    }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
 
     Column(
@@ -99,18 +134,32 @@ fun AddTransactionScreen(
             )
             BasicTextField(
                 value = amount,
-                onValueChange = { newValue ->
-                    val filterAmount = newValue.filter { it.isDigit() || it == '.' }
-                    viewModel.onAmountChange(filterAmount)
-                },
+                onValueChange = { newAmount ->
+                    val filteredAmount = newAmount.filter { it.isDigit() || it == '.' }
+                    val parts = filteredAmount.split('.')
+                    if (parts.size <= 2 && (parts.size == 1 || parts[1].length <= 2)) {
+                        viewModel.onAmountChange(filteredAmount)
+                    }                },
                 textStyle = TextStyle(
                     fontSize = 40.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth().weight(1f)
+                modifier = Modifier
+                    .widthIn(min = 1.dp) // Set a minimum width to ensure cursor is visible
+                    .focusRequester(focusRequester),
+                visualTransformation = thousandSeparatorTransformation(),
+                decorationBox = { innerTextField ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start // Align content to the start
+                    ) {
+                        innerTextField()
+                    }
+                }
             )
         }
 
@@ -323,5 +372,26 @@ fun AddTransactionScreen(
             },
             initialDate = date
         )
+    }
+}
+
+private class ThousandSeparatorOffsetMapping(
+    private val originalText: String,
+    private val formattedText: String
+) : OffsetMapping {
+
+    override fun originalToTransformed(offset: Int): Int {
+        if (originalText.isEmpty()) return 0
+        val originalIntegerPart = originalText.substringBefore('.')
+        if (offset >= originalIntegerPart.length) {
+            return formattedText.length - (originalText.length - offset)
+        }
+        val commasBefore = (formattedText.substringBefore('.').length - originalIntegerPart.length)
+        return offset + commasBefore
+    }
+
+    override fun transformedToOriginal(offset: Int): Int {
+        val commas = formattedText.take(offset).count { it == ',' }
+        return (offset - commas).coerceIn(0, originalText.length)
     }
 }

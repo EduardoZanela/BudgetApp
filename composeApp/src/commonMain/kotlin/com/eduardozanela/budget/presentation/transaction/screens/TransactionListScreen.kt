@@ -16,6 +16,7 @@ import com.eduardozanela.budget.presentation.components.MonthSelector
 import com.eduardozanela.budget.presentation.components.MonthSummaryIndicators
 import com.eduardozanela.budget.presentation.components.TransactionItem
 import com.eduardozanela.budget.presentation.transaction.TransactionListViewModel
+import com.eduardozanela.budget.utils.amountFormaterWithDollar
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
@@ -29,11 +30,8 @@ fun TransactionListScreen(
     viewModel: TransactionListViewModel = getViewModel()
 ) {
     val groupedTransactions by viewModel.groupedTransactions.collectAsState()
-
     val selectedMonth by viewModel.selectedMonth.collectAsState()
-
     val totalIncome by viewModel.totalIncome.collectAsState()
-
     val totalExpenses by viewModel.totalExpenses.collectAsState()
 
     val dateFormatter = remember {
@@ -81,6 +79,9 @@ fun TransactionListScreen(
                 val sortedDates = groupedTransactions.keys.sortedDescending()
 
                 sortedDates.forEach { date ->
+
+                    val dayTotal = groupedTransactions[date]?.sumOf { it.amount } ?: 0.0
+
                     stickyHeader {
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -94,7 +95,7 @@ fun TransactionListScreen(
                                 modifier = Modifier.weight(1f), // occupies start side
                             )
                             Text(
-                                text = "123",
+                                text = amountFormaterWithDollar(dayTotal),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.weight(1f), // occupies end side

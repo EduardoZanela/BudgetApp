@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.eduardozanela.budget.utils.amountFormaterWithDollar
 
 @Composable
 fun MonthSummaryIndicators(
@@ -43,7 +44,7 @@ fun MonthSummaryIndicators(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = "$totalIncome",
+                text = amountFormaterWithDollar(totalIncome),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -59,7 +60,7 @@ fun MonthSummaryIndicators(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = "$totalExpenses",
+                text = amountFormaterWithDollar(totalExpenses),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.error // Or MaterialTheme.colorScheme.error
             )

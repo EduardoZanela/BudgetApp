@@ -14,6 +14,10 @@ interface BankStatementExtractor {
     @Throws(Exception::class)
     fun extract(data: String) : List<TransactionRecord>
 
+    fun normalizeLineBreaks(text: String): String {
+        return text.replace("(?<!\\n)(?<!\\n[A-Z][a-z]{2} \\d{1,2})\\n(?![A-Z][a-z]{2} \\d{1,2})".toRegex(), " ")
+    }
+
     fun parseDate(date: String) : LocalDate {
         val currentYear = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year
 

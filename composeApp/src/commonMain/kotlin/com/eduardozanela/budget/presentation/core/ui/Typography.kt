@@ -8,32 +8,38 @@ import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun rememberAppTypography(): Typography {
-    val montserratFontFamily = rememberMontserratFontFamily()
+    val fireSansFontFamily = rememberFireSansFontFamily()
 
     return Typography(
         displayLarge = TextStyle(
-            fontFamily = montserratFontFamily,
+            fontFamily = fireSansFontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 32.sp,
             letterSpacing = 0.sp
         ),
         titleLarge = TextStyle(
-            fontFamily = montserratFontFamily,
-            fontWeight = FontWeight.SemiBold,
+            fontFamily = fireSansFontFamily,
+            fontWeight = FontWeight.ExtraBold,
             fontSize = 20.sp,
             letterSpacing = 0.15.sp
         ),
         bodyMedium = TextStyle(
-            fontFamily = montserratFontFamily,
+            fontFamily = fireSansFontFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 16.sp,
             letterSpacing = 0.25.sp
         ),
         labelSmall = TextStyle(
-            fontFamily = montserratFontFamily,
+            fontFamily = fireSansFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
             letterSpacing = 0.5.sp
-        )
+        ),
+        headlineSmall = TextStyle(
+            fontFamily = fireSansFontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+            letterSpacing = 0.5.sp
+        ),
     )
 }

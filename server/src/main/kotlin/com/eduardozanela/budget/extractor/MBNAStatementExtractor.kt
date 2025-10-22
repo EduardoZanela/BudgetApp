@@ -10,8 +10,12 @@ class MBNAStatementExtractor : BankStatementExtractor {
 
     override fun extract(data: String): List<TransactionRecord> {
 
-        val regex = Regex("""(\d{2}/\d{2}/\d{2})\s+(\d{2}/\d{2}/\d{2})\s+(.+?)\s+\d{4}\s+\$([\d,]+\.\d{2})""")
-        val records = parseRecords(data, Bank.MBNA, regex)
+        val regex = Regex("""(\d{2}/\d{2}/\d{2})\s+(\d{2}/\d{2}/\d{2})\s+(.+?)\s+\$([\d,]+\.\d{2})""")
+
+        var text = extractPurchasesSection(data, "PURCHASES", "Total")
+        text = normalizeLineBreaks(text)
+
+        val records = parseRecords(text, Bank.MBNA, regex)
 
         logger.info("MBNA Statement number of records found ${records.size}")
 

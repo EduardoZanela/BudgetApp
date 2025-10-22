@@ -1,15 +1,22 @@
 # Stage 1: Build the Kotlin/Wasm application
 # Use a base image with Gradle and JDK to build the project
-FROM gradle:8.13-jdk21 AS builder
+FROM gradle:8.13-jdk21-jammy AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
+
+# Install Node 20 and Yarn
+RUN apt-get update && apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs yarn
+
+ENV NODE_OPTIONS=--openssl-legacy-provider
 
 # Add a build argument that will change on each build
 ARG CACHEBUST=1
 
 # Copy the source code into the builder stage
-COPY --chown=gradle:gradle . /app
+COPY . /app
 
 # Run the Gradle task to build the distribution
 RUN gradle wasmJsBrowserDistribution --no-daemon --no-configuration-cache --refresh-dependencies
@@ -24,5 +31,3 @@ COPY --from=builder /app/composeApp/build/dist/wasmJs/productionExecutable/ /usr
 
 # Expose the default Nginx port
 EXPOSE 80
-
-# The default Nginx CMD will serve the files, so we don't need to specify one

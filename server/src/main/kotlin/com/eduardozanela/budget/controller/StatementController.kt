@@ -16,7 +16,10 @@ import com.eduardozanela.budget.data.Record
 
 @RestController
 @RequestMapping("/api/statement")
-@CrossOrigin(origins = ["https://budgetflow.eduardozanela.com", "http://localhost:8080"])
+@CrossOrigin(origins = ["https://budgetflow.eduardozanela.com",
+    "http://localhost:8080", "https://api.eduardozanela.com",
+    "http://budgetflow.eduardozanela.com",
+    "http://10.0.0.4:8080", "https://10.0.0.4:8080"])
 class StatementController(private val statementService: StatementService) {
 
     @PostMapping("/upload", produces = ["application/json"])

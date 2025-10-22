@@ -6,7 +6,7 @@ WORKDIR /app
 # Add a build argument that will change on each build
 ARG CACHEBUST=1
 
-COPY --chown=gradle:gradle . /app
+COPY . /app
 
 RUN gradle clean server:bootJar --no-daemon --no-configuration-cache --refresh-dependencies
 

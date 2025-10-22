@@ -12,10 +12,6 @@ class CTFSStatementExtractor : BankStatementExtractor {
 
     private val logger = LoggerFactory.getLogger(CTFSStatementExtractor::class.java)
 
-    private fun normalizeLineBreaks(text: String): String {
-        return text.replace("(?<!\\n)(?<!\\n[A-Z][a-z]{2} \\d{1,2})\\n(?![A-Z][a-z]{2} \\d{1,2})".toRegex(), " ")
-    }
-
     private fun extractStatementDate(text: String): kotlinx.datetime.LocalDate {
         val regex = Regex("""Statement date:\s+(.*)""")
         val match = regex.find(text)
